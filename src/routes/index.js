@@ -1,0 +1,103 @@
+// src/routes/index.js or similar
+
+import { createRouter, createWebHistory } from 'vue-router'
+import Login from '../pages/Login.vue'
+import Dashboard from '../pages/Dashboard.vue'
+import Pages from '../pages/Pages.vue'
+import Leads from '../pages/Leads.vue'
+import Referrers from '../pages/Referrers.vue'
+import DashboardLayout from '../layouts/DashboardLayout.vue'
+import AuthLayout from '../layouts/AuthLayout.vue'
+import { authStore } from '../store/authStore'
+
+const routes = [
+  {
+    path: '/',
+    component: DashboardLayout,
+    children: [ 
+      { 
+        path: '', 
+        name: 'Dashboard', 
+        component: Dashboard, 
+        meta: { isProtected: true, requiresAuth: true } 
+      },
+      {
+        path: '/dashboard',
+        name: 'Dashboard',
+        component: Dashboard,
+        meta: { isProtected: true, requiresAuth: true }
+      },
+      {
+        path: '/pages',
+        name: 'Pages',
+        component: Pages,
+        meta: { isProtected: true, requiresAuth: true, requiresAdmin: true }
+      },
+      {
+        path: '/leads',
+        name: 'Leads',
+        component: Leads,
+        meta: { isProtected: true, requiresAuth: true }
+      },
+      {
+        path: '/referrers',
+        name: 'Referrers',
+        component: Referrers,
+        meta: { isProtected: true, requiresAuth: true }
+      },      
+    ]
+  },
+  {
+    path: '/auth',
+    component: AuthLayout,
+    children: [{
+      path: "login",
+      name: "Login",
+      component: Login
+    }]
+  }
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+// Helper function to check if user is admin
+const isAdmin = (role) => {
+  if (!role) return false
+  const roleLower = role.toLowerCase()
+  return roleLower === 'admin' || 
+         roleLower === 'administrator' || 
+         roleLower === 'super_admin' || 
+         roleLower === 'superadmin' || 
+         roleLower === 'super admin'
+}
+
+router.beforeEach((to, from, next) => {
+  const auth = authStore();
+  
+  // Check if route requires authentication
+  if (to.meta.requiresAuth && !auth.token) {
+    next('/auth/login');
+    return;
+  }
+  
+  // Check if route requires admin privileges
+  if (to.meta.requiresAdmin && !isAdmin(auth.role)) {
+    // Redirect non-admin users to dashboard
+    next('/dashboard');
+    return;
+  }
+  
+  // If user is logged in and trying to access login page, redirect to dashboard
+  if (to.path === '/auth/login' && auth.token) {
+    next('/dashboard');
+    return;
+  }
+  
+  // Allow access to the route
+  next();
+});
+
+export default router
