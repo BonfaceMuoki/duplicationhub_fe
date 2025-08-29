@@ -19,31 +19,31 @@ const routes = [
         path: '', 
         name: 'Dashboard', 
         component: Dashboard, 
-        meta: { isProtected: true, requiresAuth: true } 
+        meta: { isProtected: false, requiresAuth: true } 
       },
       {
         path: '/dashboard',
         name: 'Dashboard',
         component: Dashboard,
-        meta: { isProtected: true, requiresAuth: true }
+        meta: { isProtected: false, requiresAuth: true }
       },
       {
         path: '/pages',
         name: 'Pages',
         component: Pages,
-        meta: { isProtected: true, requiresAuth: true, requiresAdmin: true }
+        meta: { isProtected: false, requiresAuth: true, requiresAdmin: true }
       },
       {
         path: '/leads',
         name: 'Leads',
         component: Leads,
-        meta: { isProtected: true, requiresAuth: true }
+        meta: { isProtected: false, requiresAuth: true }
       },
       {
         path: '/referrers',
         name: 'Referrers',
         component: Referrers,
-        meta: { isProtected: true, requiresAuth: true }
+        meta: { isProtected: false, requiresAuth: true }
       },      
     ]
   },
@@ -78,23 +78,23 @@ router.beforeEach((to, from, next) => {
   const auth = authStore();
   
   // Check if route requires authentication
-  if (to.meta.requiresAuth && !auth.token) {
-    next('/auth/login');
-    return;
-  }
+  // if (to.meta.requiresAuth && !auth.token) {
+  //   next('/auth/login');
+  //   return;
+  // }
   
   // Check if route requires admin privileges
-  if (to.meta.requiresAdmin && !isAdmin(auth.role)) {
-    // Redirect non-admin users to dashboard
-    next('/dashboard');
-    return;
-  }
+  // if (to.meta.requiresAdmin && !isAdmin(auth.role)) {
+  //   // Redirect non-admin users to dashboard
+  //   next('/dashboard');
+  //   return;
+  // }
   
   // If user is logged in and trying to access login page, redirect to dashboard
-  if (to.path === '/auth/login' && auth.token) {
-    next('/dashboard');
-    return;
-  }
+  // if (to.path === '/auth/login' && auth.token) {
+  //   next('/dashboard');
+  //   return;
+  // }
   
   // Allow access to the route
   next();
