@@ -34,6 +34,55 @@
         </button>
       </div>
     </div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <div class="flex items-center">
+          <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+            <i class="fas fa-file-alt text-blue-600 dark:text-blue-400 w-5 h-5"></i>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Pages</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ pagination.total }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <div class="flex items-center">
+          <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+            <i class="fas fa-eye text-green-600 dark:text-green-400 w-5 h-5"></i>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Views</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ pages.reduce((sum, page) => sum + (page.views || 0), 0) }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <div class="flex items-center">
+          <div class="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+            <i class="fas fa-users text-purple-600 dark:text-purple-400 w-5 h-5"></i>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Leads</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ pages.reduce((sum, page) => sum + (page.leads_count || 0), 0) }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <div class="flex items-center">
+          <div class="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
+            <i class="fas fa-mouse-pointer text-orange-600 dark:text-orange-400 w-5 h-5"></i>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Clicks</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ pages.reduce((sum, page) => sum + (page.total_clicks || 0), 0) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
       <!-- Loading State -->
@@ -140,55 +189,7 @@
     </div>
 
     <!-- Summary Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <div class="flex items-center">
-          <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-            <i class="fas fa-file-alt text-blue-600 dark:text-blue-400 w-5 h-5"></i>
-          </div>
-          <div class="ml-4">
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Pages</p>
-            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ pagination.total }}</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <div class="flex items-center">
-          <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-            <i class="fas fa-eye text-green-600 dark:text-green-400 w-5 h-5"></i>
-          </div>
-          <div class="ml-4">
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Views</p>
-            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ pages.reduce((sum, page) => sum + (page.views || 0), 0) }}</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <div class="flex items-center">
-          <div class="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-            <i class="fas fa-users text-purple-600 dark:text-purple-400 w-5 h-5"></i>
-          </div>
-          <div class="ml-4">
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Leads</p>
-            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ pages.reduce((sum, page) => sum + (page.leads_count || 0), 0) }}</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <div class="flex items-center">
-          <div class="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
-            <i class="fas fa-mouse-pointer text-orange-600 dark:text-orange-400 w-5 h-5"></i>
-          </div>
-          <div class="ml-4">
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Clicks</p>
-            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ pages.reduce((sum, page) => sum + (page.total_clicks || 0), 0) }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
+
 
     <!-- Bulk Actions -->
     <div v-if="selectedPages.length > 0" class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">

@@ -69,6 +69,7 @@ const handleLogin = async () => {
       role:res.data.role,
       permissions:res.data.permissions
     })
+    console.log(store?.isAuthenticated,"store.isAuthenticated");
     toast.success(`Welcome ${res.data.user.first_name}`);
     router.push('/dashboard')
   } catch (error) {

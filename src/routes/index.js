@@ -14,12 +14,13 @@ const routes = [
   {
     path: '/',
     component: DashboardLayout,
+    meta: { isProtected: true, requiresAuth: true },
     children: [ 
       { 
         path: '', 
         name: 'Dashboard', 
         component: Dashboard, 
-        meta: { isProtected: false, requiresAuth: true } 
+        meta: { isProtected: true, requiresAuth: true } 
       },
       {
         path: '/dashboard',
@@ -76,25 +77,27 @@ const isAdmin = (role) => {
 
 router.beforeEach((to, from, next) => {
   const auth = authStore();
+  console.log('Auth state:', auth);
+  console.log('Token:', auth.token);
+  console.log('isAuthenticated:', auth.isAuthenticated);
   
-  // Check if route requires authentication
-  // if (to.meta.requiresAuth && !auth.token) {
-  //   next('/auth/login');
-  //   return;
-  // }
+  // Check if route requires authentication and user is not authenticated
+  if (to.meta.requiresAuth && !auth.isAuthenticated) {
+    console.log('Redirecting to login - user not authenticated');
+    next('/auth/login');
+    return;
+  }
   
   // Check if route requires admin privileges
-  // if (to.meta.requiresAdmin && !isAdmin(auth.role)) {
-  //   // Redirect non-admin users to dashboard
-  //   next('/dashboard');
-  //   return;
-  // }
+  if (to.meta.requiresAdmin && !isAdmin(auth.role)) {
+    return;
+  }
   
   // If user is logged in and trying to access login page, redirect to dashboard
-  // if (to.path === '/auth/login' && auth.token) {
-  //   next('/dashboard');
-  //   return;
-  // }
+  if (to.path === '/auth/login' && auth.isAuthenticated) {
+    next('/dashboard');
+    return;
+  }
   
   // Allow access to the route
   next();

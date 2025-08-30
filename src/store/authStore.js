@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 
 export const authStore = defineStore("auth", {
   state: () => ({
-    isAuthenticated: false,
     user: null,
     token: null,
     refreshToken: null,
@@ -10,7 +9,7 @@ export const authStore = defineStore("auth", {
     permissions: {},
   }),
   getters: {
-    isAuthenticated: (state) => !!state.token,
+    isAuthenticated: (state) => !!state.refreshToken,
     loggedUser: (state) => state.user,
     getRole: (state) => state.role,
     getPermissions: (state) => state.permissions,
