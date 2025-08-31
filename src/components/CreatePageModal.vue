@@ -13,7 +13,7 @@
         <!-- Header -->
         <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-            {{ pageFormStore.isEditMode ? 'Edit Landing Page' : 'Create New Landing Page' }}
+            {{ pageFormStore.isEditMode ? 'Edit Landing Page' : 'Creating New Page' }}
           </h3>
           <button
             @click="closeModal"
@@ -80,6 +80,7 @@
                     v-model="pageFormStore.formData.title"
                     type="text"
                     required
+                    @input="generateSlugFromTitle"
                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                     placeholder="Enter page title"
                   />
@@ -164,23 +165,23 @@
                     v-model="pageFormStore.formData.capture_mode"
                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                   >
-                    <option value="modal">Modal</option>
                     <option value="inline">Inline</option>
-                    <option value="redirect">Redirect</option>
+                    <!-- <option value="modal">Modal</option>                   -->
+                    <!-- <option value="redirect">Redirect</option> -->
                   </select>
                 </div>
               </div>
 
               <div class="mt-6">
                 <label for="platform_base_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Platform Base URL
+                  Add The Page Url in format (https://www.example.com)
                 </label>
                 <input
                   id="platform_base_url"
                   v-model="pageFormStore.formData.platform_base_url"
                   type="url"
                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="https://platform.example.com"
+                  placeholder=""
                 />
               </div>
 
@@ -209,6 +210,18 @@
                   />
                   <label for="is_active" class="ml-2 block text-sm text-gray-900 dark:text-white">
                     Active
+                  </label>
+                </div>
+
+                <div class="flex items-center mt-4">
+                  <input
+                    id="is_public"
+                    v-model="pageFormStore.formData.is_public"
+                    type="checkbox"
+                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label for="is_public" class="ml-2 block text-sm text-gray-900 dark:text-white">
+                    Public
                   </label>
                 </div>
               </div>
@@ -410,6 +423,7 @@ import { usePageFormStore } from '../store/pageFormStore'
 import pagesService from '../services/pagesService'
 import { Ckeditor } from '@ckeditor/ckeditor5-vue'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+import { useToast } from 'vue-toast-notification'
 
 
 
@@ -424,6 +438,9 @@ const emit = defineEmits(['close', 'page-created', 'page-updated'])
 
 // Use Pinia store
 const pageFormStore = usePageFormStore()
+
+// Initialize toaster
+const toast = useToast()
 
 // CKEditor setup using self-hosted build
 const editor = ClassicEditor
@@ -461,6 +478,12 @@ watch(() => props.isOpen, (isOpen) => {
   console.log('Modal open state changed:', isOpen)
   if (isOpen) {
     console.log('Modal opened, preparing...')
+    // Ensure capture_mode defaults to 'inline' when creating new pages
+    if (!pageFormStore.isEditMode) {
+      console.log('Setting capture_mode to inline for new page')
+      pageFormStore.updateFormField('capture_mode', 'inline')
+      console.log('capture_mode after setting:', pageFormStore.formData.capture_mode)
+    }
     // If editing and we have body content, go to step 3 to show the editor
     if (pageFormStore.isEditMode && pageFormStore.formData.body) {
       console.log('Edit mode with body content, going to step 3...')
@@ -472,17 +495,29 @@ watch(() => props.isOpen, (isOpen) => {
 })
 
 // Auto-generate slug from title
-watch(() => pageFormStore.formData.title, (newTitle) => {
-  if (newTitle && !pageFormStore.formData.slug) {
-    pageFormStore.updateFormField('slug', newTitle
+watch(() => pageFormStore.formData.title, (newTitle, oldTitle) => {
+  console.log('Title watch triggered:', { newTitle, oldTitle })
+  
+  if (newTitle && newTitle !== oldTitle) {
+    // Always generate slug from title, regardless of existing slug
+    const generatedSlug = newTitle
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .trim()
-    )
+    
+    console.log('Title changed:', newTitle)
+    console.log('Generated slug:', generatedSlug)
+    console.log('Current slug before update:', pageFormStore.formData.slug)
+    
+    // Use nextTick to ensure reactivity
+    nextTick(() => {
+      pageFormStore.updateFormField('slug', generatedSlug)
+      console.log('Slug after update:', pageFormStore.formData.slug)
+    })
   }
-})
+}, { immediate: true })
 
 // Populate form with existing page data for editing
 const populateFormForEdit = (pageData) => {
@@ -612,10 +647,12 @@ const handleSubmit = async () => {
       response = await pagesService.updatePage(pageFormStore.pageId, pageFormStore.formData)
       
       if (response.success) {
+        toast.success('Page updated successfully!')
         emit('page-updated', response.data)
         closeModal()
         resetForm()
       } else {
+        toast.error(response.message || 'Failed to update page')
         pageFormStore.setError('general', response.message || 'Failed to update page')
       }
     } else {
@@ -623,22 +660,47 @@ const handleSubmit = async () => {
       response = await pagesService.createPage(pageFormStore.formData)
       
       if (response.success) {
+        toast.success('Page created successfully!')
         emit('page-created', response.data)
         closeModal()
         resetForm()
       } else {
+        toast.error(response.message || 'Failed to create page')
         pageFormStore.setError('general', response.message || 'Failed to create page')
       }
     }
   } catch (error) {
     console.error('Error saving page:', error)
+    toast.error('An error occurred while saving the page')
     pageFormStore.setError('general', 'An error occurred while saving the page')
   } finally {
     pageFormStore.setLoading(false)
   }
 }
 
+// Manual slug generation method as backup
+const generateSlugFromTitle = () => {
+  const title = pageFormStore.formData.title
+  if (title) {
+    const generatedSlug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim()
+    
+    console.log('Manual slug generation:', { title, generatedSlug })
+    pageFormStore.updateFormField('slug', generatedSlug)
+  }
+}
+
 // Component lifecycle
+onMounted(() => {
+  // Ensure capture_mode defaults to 'inline' when component mounts
+  if (!pageFormStore.isEditMode) {
+    pageFormStore.updateFormField('capture_mode', 'inline')
+  }
+})
 </script>
 
 <style scoped>

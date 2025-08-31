@@ -8,6 +8,7 @@ import Dashboard from '../pages/Dashboard.vue'
 import Pages from '../pages/Pages.vue'
 import Leads from '../pages/Leads.vue'
 import Referrers from '../pages/Referrers.vue'
+import OrganizationSettings from '../pages/OrganizationSettings.vue'
 import DashboardLayout from '../layouts/DashboardLayout.vue'
 import AuthLayout from '../layouts/AuthLayout.vue'
 import { authStore } from '../store/authStore'
@@ -47,6 +48,12 @@ const routes = [
         name: 'Referrers',
         component: Referrers,
         meta: { isProtected: false, requiresAuth: true }
+      },
+      {
+        path: '/organization-settings',
+        name: 'OrganizationSettings',
+        component: OrganizationSettings,
+        meta: { isProtected: false, requiresAuth: true, requiresAdmin: true }
       },      
     ]
   },

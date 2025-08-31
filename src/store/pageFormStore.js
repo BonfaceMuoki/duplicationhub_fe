@@ -13,11 +13,11 @@ export const usePageFormStore = defineStore('pageForm', () => {
     cta_text: 'Get Started Now',
     cta_subtext: 'Join thousands of satisfied customers',
     body: '',
-    capture_mode: 'modal',
+    capture_mode: 'inline',
     show_consent: true,
     consent_text: 'I agree to receive marketing communications',
-    platform_base_url: 'https://platform.example.com',
-    status: 'draft',
+    platform_base_url: '',
+    status: 'published',
     is_active: true
   })
 
@@ -68,12 +68,13 @@ export const usePageFormStore = defineStore('pageForm', () => {
       cta_text: 'Get Started Now',
       cta_subtext: 'Join thousands of satisfied customers',
       body: '',
-      capture_mode: 'modal',
+      capture_mode: 'inline',
       show_consent: true,
       consent_text: 'I agree to receive marketing communications',
-      platform_base_url: 'https://platform.example.com',
-      status: 'draft',
-      is_active: true
+      platform_base_url: '',
+      status: 'published',
+      is_active: true,
+      is_public: false
     }
     
     currentStep.value = 0
@@ -97,12 +98,13 @@ export const usePageFormStore = defineStore('pageForm', () => {
       cta_text: pageData.cta_text || 'Get Started Now',
       cta_subtext: pageData.cta_subtext || 'Join thousands of satisfied customers',
       body: pageData.body || '',
-      capture_mode: pageData.capture_mode || 'modal',
+      capture_mode: pageData.capture_mode || 'inline',
       show_consent: pageData.show_consent || true,
       consent_text: pageData.consent_text || 'I agree to receive marketing communications',
-      platform_base_url: pageData.platform_base_url || 'https://platform.example.com',
-      status: pageData.status || 'draft',
-      is_active: pageData.is_active || true
+      platform_base_url: pageData.platform_base_url || '',
+      status: pageData.status || 'published',
+      is_active: pageData.is_active || true,
+      is_public: pageData.is_public || false
     }
     
     // Set image preview if image exists

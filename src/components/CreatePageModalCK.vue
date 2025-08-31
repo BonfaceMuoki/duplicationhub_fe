@@ -108,14 +108,15 @@
                 <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Title *
                 </label>
-                <input
-                  id="title"
-                  v-model="pageFormStore.formData.title"
-                  type="text"
-                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="Page Title"
-                  required
-                />
+                                  <input
+                    id="title"
+                    v-model="pageFormStore.formData.title"
+                    type="text"
+                    @input="generateSlugFromTitle"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    placeholder="Page Title"
+                    required
+                  />
                 <div v-if="pageFormStore.errors.title" class="mt-1 text-sm text-red-600 dark:text-red-400">
                   {{ pageFormStore.errors.title }}
                 </div>
@@ -185,7 +186,7 @@
                   v-model="pageFormStore.formData.platform_base_url"
                   type="url"
                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="https://platform.example.com"
+                  placeholder=""
                   required
                 />
                 <div v-if="pageFormStore.errors.platform_base_url" class="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -454,7 +455,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { Ckeditor, useCKEditorCloud } from '@ckeditor/ckeditor5-vue'
 import { usePageFormStore } from '../store/pageFormStore'
 import pagesService from '../services/pagesService'
@@ -584,6 +585,47 @@ watch(() => props.isOpen, (newValue) => {
     pageFormStore.resetForm()
   }
 })
+
+// Manual slug generation method as backup
+const generateSlugFromTitle = () => {
+  const title = pageFormStore.formData.title
+  if (title) {
+    const generatedSlug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim()
+    
+    console.log('Manual slug generation:', { title, generatedSlug })
+    pageFormStore.updateFormField('slug', generatedSlug)
+  }
+}
+
+// Auto-generate slug from title
+watch(() => pageFormStore.formData.title, (newTitle, oldTitle) => {
+  console.log('Title watch triggered:', { newTitle, oldTitle })
+  
+  if (newTitle && newTitle !== oldTitle) {
+    // Always generate slug from title, regardless of existing slug
+    const generatedSlug = newTitle
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim()
+    
+    console.log('Title changed:', newTitle)
+    console.log('Generated slug:', generatedSlug)
+    console.log('Current slug before update:', pageFormStore.formData.slug)
+    
+    // Use nextTick to ensure reactivity
+    nextTick(() => {
+      pageFormStore.updateFormField('slug', generatedSlug)
+      console.log('Slug after update:', pageFormStore.formData.slug)
+    })
+  }
+}, { immediate: true })
 </script>
 
 <style scoped>

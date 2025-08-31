@@ -155,19 +155,33 @@
       >
         <template #actions="{ row }">
           <div class="flex items-center gap-2">
-            <button
+            <!-- <button
               @click="viewPage(row)"
               class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               title="View Page"
             >
               <i class="fas fa-eye w-4 h-4"></i>
-            </button>
+            </button> -->
             <button
               @click="editPage(row)"
               class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
               title="Edit Page"
             >
               <i class="fas fa-edit w-4 h-4"></i>
+            </button>
+            <button
+              @click="copyFullUrl(row)"
+              class="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300"
+              title="Copy Full URL"
+            >
+              <i class="fas fa-copy w-4 h-4"></i>
+            </button>
+            <button
+              @click="openFullLink(row)"
+              class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+              title="Open Full Link"
+            >
+              <i class="fas fa-external-link-alt w-4 h-4"></i>
             </button>
             <button
               @click="togglePageStatus(row)"
@@ -290,7 +304,7 @@ const columns = [
   { key: 'views', label: 'Views' },
   { key: 'leads_count', label: 'Leads' },
   { key: 'total_clicks', label: 'Clicks' },
-  { key: 'publish_at', label: 'Published' },
+  { key: 'is_public', label: 'iS Public' },
   { key: 'is_active', label: 'Active' }
 ]
 
@@ -412,6 +426,8 @@ const clearSearch = () => {
 const createNewPage = () => {
   pageFormStore.resetForm()
   pageFormStore.setEditMode(false)
+  // Ensure capture_mode defaults to 'inline' for new pages
+  pageFormStore.updateFormField('capture_mode', 'inline')
   showCreateModal.value = true
 }
 
@@ -450,6 +466,40 @@ const handlePageUpdated = (updatedPage) => {
 const viewPage = (page) => {
   console.log('Viewing page:', page)
   // Implement view logic
+}
+
+const copyFullUrl = async (page) => {
+  try {
+    if (page.full_url) {
+      await navigator.clipboard.writeText(page.full_url)
+      // You could add a toast notification here to show success
+      console.log('Full URL copied to clipboard:', page.full_url)
+    } else {
+      console.warn('No full_url available for this page')
+    }
+  } catch (error) {
+    console.error('Failed to copy URL:', error)
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea')
+    textArea.value = page.full_url || ''
+    document.body.appendChild(textArea)
+    textArea.select()
+    try {
+      document.execCommand('copy')
+      console.log('Full URL copied to clipboard (fallback method):', page.full_url)
+    } catch (fallbackError) {
+      console.error('Fallback copy method failed:', fallbackError)
+    }
+    document.body.removeChild(textArea)
+  }
+}
+
+const openFullLink = (page) => {
+  if (page.full_url) {
+    window.open(page.full_url, '_blank', 'noopener,noreferrer')
+  } else {
+    console.warn('No full_url available for this page')
+  }
 }
 
 const togglePageStatus = (page) => {
