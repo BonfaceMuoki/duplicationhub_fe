@@ -17,5 +17,22 @@ const logOutUser = async () => {
     }
 };
 
+const requestPasswordReset = async (data) => {
+    try {
+        const response = await api.post('/auth/forgot-password', data);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
 
-export {loginUser,logOutUser}
+const resetPassword = async (data) => {
+    try {
+        const response = await api.post('/auth/reset-password', data);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export {loginUser, logOutUser, requestPasswordReset, resetPassword}
