@@ -832,11 +832,12 @@ const formatDate = (dateString) => {
 const createWhatsAppLink = (phoneNumber, message, pageTitle = '', pageUrl = '') => {
   // Format phone number
   let formattedPhone = phoneNumber
+  console.log('formattedPhone', formattedPhone)
   if (formattedPhone.startsWith('+')) {
     formattedPhone = formattedPhone.substring(1)
   } else if (formattedPhone.startsWith('0') && formattedPhone.length === 10) {
     // Kenyan number starting with 0, replace with 254
-    formattedPhone = '254' + formattedPhone.substring(1)
+    formattedPhone = '27' + formattedPhone.substring(1)
   }
   
   // Create message with page context if available
