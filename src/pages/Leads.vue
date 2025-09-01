@@ -233,6 +233,7 @@
                 >
                   <i class="fas fa-ad w-4 h-4"></i>
                 </button>
+                
               </div>
             <button
               @click="toggleLeadStatus(row)"
@@ -331,7 +332,7 @@
           
           <div>
             <label for="pageUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Landing Page URL
+              Referers {{ whatsAppForm.selectedLead?.page_title || 'Page' }} invite link
             </label>
             <input
               id="pageUrl"
@@ -344,6 +345,43 @@
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
               The page you want to share with this lead
             </p>
+          </div>
+          
+          <!-- Advertisement Mode Fields -->
+          <div v-if="whatsAppForm.isAdvertisementMode" class="space-y-4">
+            <div>
+              <label for="submitterExternalLink" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Submitter External Link
+              </label>
+              <input
+                id="submitterExternalLink"
+                v-model="whatsAppForm.submitterExternalLink"
+                type="url"
+                placeholder="https://example.com/external-link"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-colors"
+                required
+              />
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                The external link for the submitter
+              </p>
+            </div>
+            
+            <div>
+              <label for="externalReferralCode" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                External Referral Code
+              </label>
+              <input
+                id="externalReferralCode"
+                v-model="whatsAppForm.externalReferralCode"
+                type="text"
+                placeholder="Enter external referral code"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-colors"
+                required
+              />
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                The external referral code to track conversions
+              </p>
+            </div>
           </div>
           
           <div>
@@ -456,7 +494,10 @@ const whatsAppForm = ref({
   pageUrl: '',
   message: '',
   submitting: false,
-  selectedLead: null
+  selectedLead: null,
+  submitterExternalLink: '',
+  externalReferralCode: '',
+  isAdvertisementMode: false
 })
 
 // Pagination
@@ -699,8 +740,12 @@ const launchWhatsAppForLead = (lead) => {
   
   // Pre-fill the form with lead information
   whatsAppForm.value.selectedLead = lead
-  whatsAppForm.value.pageUrl = lead.page?.full_image_url ? lead.page.full_image_url.split('/storage/')[0] + '/pages/' + lead.page.slug : ''
+  // Set default pageUrl to the referrer's full_external_invite_url
+  whatsAppForm.value.pageUrl = lead.referrer_invite?.full_external_invite_url || ''
   whatsAppForm.value.message = `Hi ${lead.name}! 👋\n\nThank you for your interest in our landing page. We'd love to connect with you!\n\nBest regards,\nYour Team`
+  whatsAppForm.value.submitterExternalLink = ''
+  whatsAppForm.value.externalReferralCode = ''
+  whatsAppForm.value.isAdvertisementMode = false
   
   showWhatsAppModal.value = true
 }
@@ -718,6 +763,9 @@ const launchWhatsAppForAdvertisement = (lead) => {
   whatsAppForm.value.selectedLead = lead
   whatsAppForm.value.pageUrl = advertisementUrl
   whatsAppForm.value.message = `Hi ${lead.name}, thank you for registering on this page using my earlier link, here is your link to share with friends`
+  whatsAppForm.value.submitterExternalLink = lead.submitter_invite?.full_external_invite_url || ''
+  whatsAppForm.value.externalReferralCode = lead.submitter_invite?.external_invite_code || ''
+  whatsAppForm.value.isAdvertisementMode = true
   
   showWhatsAppModal.value = true
 }
@@ -743,7 +791,10 @@ const closeWhatsAppModal = () => {
     pageUrl: '',
     message: '',
     submitting: false,
-    selectedLead: null
+    selectedLead: null,
+    submitterExternalLink: '',
+    externalReferralCode: '',
+    isAdvertisementMode: false
   }
 }
 
@@ -764,12 +815,20 @@ const submitWhatsAppCampaign = async () => {
     }
     
     // Submit to the API endpoint
-    const response = await api.put(`/leads/${leadId}/status`, {
+    const payload = {
       status: 'joining_link_shared',
       notes: 'Shared joining link with lead',
       landing_page_url: whatsAppForm.value.pageUrl,
       personal_message: whatsAppForm.value.message
-    })
+    }
+    
+    // Add advertisement mode fields if in advertisement mode
+    if (whatsAppForm.value.isAdvertisementMode) {
+      payload.full_external_invite_url = whatsAppForm.value.submitterExternalLink
+      payload.external_invite_code = whatsAppForm.value.externalReferralCode
+    }
+    
+    const response = await api.put(`/leads/${leadId}/status`, payload)
     
     if (response.data.success) {
       // Get the lead data from response
