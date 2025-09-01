@@ -774,8 +774,8 @@ const submitWhatsAppCampaign = async () => {
     if (response.data.success) {
       // Get the lead data from response
       const leadData = response.data.data
-      console.log('leadData', leadData);
-      const whatsappNumber = leadData?.submitter_invite?.phone_number
+      console.log('leadData', leadData?.submitter_user);
+      const whatsappNumber = leadData?.submitter_user?.phone_number
       const personalMessage = whatsAppForm.value.message
       const pageUrl = whatsAppForm.value.pageUrl
       
