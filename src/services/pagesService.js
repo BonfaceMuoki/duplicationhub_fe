@@ -122,6 +122,19 @@ async function bulkDeletePages(pageIds) {
   }
 }
 
+// Get page referrer data
+async function getPageReferrers(pageId) {
+  try {
+    const response = await api.get('/invites/tree', {
+      params: { page_id: pageId }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error fetching page referrers:', error)
+    throw error
+  }
+}
+
 export default {
   getPages,
   getPage,
@@ -130,5 +143,6 @@ export default {
   deletePage,
   togglePageStatus,
   bulkUpdatePages,
-  bulkDeletePages
+  bulkDeletePages,
+  getPageReferrers
 } 

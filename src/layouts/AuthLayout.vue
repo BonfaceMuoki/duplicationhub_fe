@@ -1,6 +1,6 @@
 <template lang="">
     <div class="grid  sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 ">
-        <div class="hidden sm:block col-span-1 h-screen flex flex-1 justify-center items-center w-full bg-[#28a745]" 
+        <div class="hidden sm:block col-span-1 h-screen flex flex-1 justify-center items-center w-full bg-[#FFFFFF]" 
        
         >
                 <div class="w-full h-screen text-center  flex flex-col justify-center items-center text-white px-4">

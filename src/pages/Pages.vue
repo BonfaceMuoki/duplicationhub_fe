@@ -170,6 +170,13 @@
               <i class="fas fa-edit w-4 h-4"></i>
             </button>
             <button
+              @click="viewPageReferrers(row)"
+              class="text-cyan-600 hover:text-cyan-800 dark:text-cyan-400 dark:hover:text-cyan-300"
+              title="View Page Referrers"
+            >
+              <i class="fas fa-sitemap w-4 h-4"></i>
+            </button>
+            <button
               @click="copyFullUrl(row)"
               class="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300"
               title="Copy Full URL"
@@ -247,18 +254,28 @@
       @close="closeEditModal"
       @page-updated="handlePageUpdated"
     />
+
+    <!-- Page Referrers Modal - Now using dedicated page -->
+    <!-- <PageReferrersModal
+      :is-open="showReferrersModal"
+      :page-data="selectedPageForReferrers"
+      @close="closeReferrersModal"
+    /> -->
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { usePageFormStore } from '../store/pageFormStore'
 import Datatable from '../components/Datatable.vue'
 import CreatePageModal from '../components/CreatePageModal.vue'
+// import PageReferrersModal from '../components/PageReferrersModal.vue'
 import pagesService from '../services/pagesService'
 
-// Use Pinia store
+// Use Pinia store and router
 const pageFormStore = usePageFormStore()
+const router = useRouter()
 
 // Reactive data
 const pages = ref([])
@@ -276,6 +293,8 @@ const error = ref(null)
 const searchQuery = ref('')
 const showCreateModal = ref(false)
 const showEditModal = ref(false)
+// const showReferrersModal = ref(false)
+// const selectedPageForReferrers = ref(null)
 
 // Utility functions
 const formatDate = (dateString) => {
@@ -467,6 +486,17 @@ const viewPage = (page) => {
   console.log('Viewing page:', page)
   // Implement view logic
 }
+
+const viewPageReferrers = (page) => {
+  console.log('View page referrers clicked for:', page)
+  // Navigate to the dedicated referrers page
+  router.push(`/pages/${page.id}/referrers`)
+}
+
+// const closeReferrersModal = () => {
+//   showReferrersModal.value = false
+//   selectedPageForReferrers.value = null
+// }
 
 const copyFullUrl = async (page) => {
   try {

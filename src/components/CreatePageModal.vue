@@ -418,7 +418,7 @@
 </template>
 
 <script setup>
-import { ref, watch, defineProps, defineEmits, computed, nextTick, onMounted } from 'vue'
+import { ref, watch, computed, nextTick, onMounted } from 'vue'
 import { usePageFormStore } from '../store/pageFormStore'
 import pagesService from '../services/pagesService'
 import { Ckeditor } from '@ckeditor/ckeditor5-vue'

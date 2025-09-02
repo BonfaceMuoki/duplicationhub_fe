@@ -1,6 +1,5 @@
 <script setup>
-import { ref, computed, watch, defineEmits } from 'vue';
-import { defineProps } from 'vue';
+import { ref, computed, watch } from 'vue';
 const selectedClassTo = ref('');
 const selectedStreamTo = ref('');
 

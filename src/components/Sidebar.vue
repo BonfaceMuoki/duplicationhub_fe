@@ -24,10 +24,10 @@
         </router-link>
 
         <!-- Settings -->
-        <router-link to="/organization-settings" class="flex items-center gap-3 px-4 py-2 rounded-md" :class="navLinkClass('/settings')">
+        <!-- <router-link to="/organization-settings" class="flex items-center gap-3 px-4 py-2 rounded-md" :class="navLinkClass('/settings')">
           <i class="fas fa-cogs w-5"></i>
           <span>Settings</span>
-        </router-link>
+        </router-link> -->
       </template>
 
       <!-- Common Navigation for All Users -->

@@ -6,6 +6,7 @@ import ForgotPassword from '../pages/ForgotPassword.vue'
 import ResetPassword from '../pages/ResetPassword.vue'
 import Dashboard from '../pages/Dashboard.vue'
 import Pages from '../pages/Pages.vue'
+import PageReferrers from '../pages/PageReferrers.vue'
 import Leads from '../pages/Leads.vue'
 import Referrers from '../pages/Referrers.vue'
 import OrganizationSettings from '../pages/OrganizationSettings.vue'
@@ -35,6 +36,12 @@ const routes = [
         path: '/pages',
         name: 'Pages',
         component: Pages,
+        meta: { isProtected: false, requiresAuth: true, requiresAdmin: true }
+      },
+      {
+        path: '/pages/:id/referrers',
+        name: 'PageReferrers',
+        component: PageReferrers,
         meta: { isProtected: false, requiresAuth: true, requiresAdmin: true }
       },
       {
