@@ -108,71 +108,109 @@
         </div>
       </div>
 
-      <!-- Root Invite Section -->
-      <div v-if="referrerData.root_invite" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-          <i class="fas fa-crown text-yellow-500 mr-3"></i>
-          Root Invite
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Handle</p>
-            <p class="font-medium text-gray-900 dark:text-white text-lg">{{ referrerData.root_invite.handle }}</p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">User</p>
-            <p class="font-medium text-gray-900 dark:text-white text-lg">{{ referrerData.root_invite.user?.name }}</p>
-            <p class="text-sm text-gray-500 dark:text-gray-500">{{ referrerData.root_invite.user?.email }}</p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Performance</p>
-            <div class="flex gap-4">
-              <div>
-                <p class="text-xs text-gray-500 dark:text-gray-500">Clicks</p>
-                <p class="font-medium text-gray-900 dark:text-white">{{ referrerData.root_invite.clicks }}</p>
-              </div>
-              <div>
-                <p class="text-xs text-gray-500 dark:text-gray-500">Leads</p>
-                <p class="font-medium text-gray-900 dark:text-white">{{ referrerData.root_invite.leads_count }}</p>
-              </div>
-            </div>
-          </div>
-          <div class="md:col-span-2 lg:col-span-3">
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Join URL</p>
-            <div class="flex items-center gap-2">
-              <p class="font-medium text-blue-600 dark:text-blue-400 break-all flex-1">{{ referrerData.root_invite.join_url }}</p>
-              <button
-                @click="copyUrl(referrerData.root_invite.join_url)"
-                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md p-1"
-                title="Copy URL"
-              >
-                <i class="fas fa-copy w-4 h-4"></i>
-              </button>
-              <button
-                @click="openUrl(referrerData.root_invite.join_url)"
-                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md p-1"
-                title="Open URL"
-              >
-                <i class="fas fa-external-link-alt w-4 h-4"></i>
-              </button>
-            </div>
-          </div>
-        </div>
+
+
+      <!-- Debug Information (temporary) -->
+      <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+        <h4 class="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-2">Debug Info:</h4>
+        <p class="text-xs text-yellow-700 dark:text-yellow-300">
+          Tree length: {{ referrerData.tree?.length || 0 }} | 
+          Has tree: {{ !!referrerData.tree }} | 
+          First node: {{ referrerData.tree?.[0]?.user?.name || 'None' }}
+        </p>
       </div>
 
       <!-- Referrer Tree -->
       <div v-if="referrerData.tree && referrerData.tree.length > 0" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
           <i class="fas fa-sitemap text-blue-500 mr-3"></i>
-          Referrer Tree
+          Referrer Tree ({{ referrerData.tree.length }} {{ referrerData.tree.length === 1 ? 'referrer' : 'referrers' }})
         </h3>
         <div class="space-y-4">
-          <ReferrerTreeNode
-            v-for="node in referrerData.tree"
-            :key="node.id"
-            :node="node"
-            :depth="0"
-          />
+          <!-- Root invite as the starting point of the tree -->
+          <div class="border-l-2 border-gray-200 dark:border-gray-600">
+            <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4 mb-2 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+                      {{ referrerData.root_invite.handle }}
+                    </span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+                      <i class="fas fa-crown mr-1"></i>
+                      Root
+                    </span>
+                    <span v-if="referrerData.root_invite.is_active" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                      Active
+                    </span>
+                    <span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                      Inactive
+                    </span>
+                  </div>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <p class="text-gray-600 dark:text-gray-400">User</p>
+                      <p class="font-medium text-gray-900 dark:text-white">{{ referrerData.root_invite.user?.name }}</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-500">{{ referrerData.root_invite.user?.email }}</p>
+                    </div>
+                    <div>
+                      <p class="text-gray-600 dark:text-gray-400">Performance</p>
+                      <div class="flex gap-4">
+                        <div>
+                          <p class="text-xs text-gray-500 dark:text-gray-500">Clicks</p>
+                          <p class="font-medium text-gray-900 dark:text-white">{{ referrerData.root_invite.clicks }}</p>
+                        </div>
+                        <div>
+                          <p class="text-xs text-gray-500 dark:text-gray-500">Leads</p>
+                          <p class="font-medium text-gray-900 dark:text-white">{{ referrerData.root_invite.leads_count }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-gray-600 dark:text-gray-400">Invited by</p>
+                      <p class="font-medium text-gray-900 dark:text-white">System</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-500">Root Invite</p>
+                    </div>
+                  </div>
+                  
+                  <div class="mt-2">
+                    <p class="text-gray-600 dark:text-gray-400 text-xs">Join URL</p>
+                    <p class="text-blue-600 dark:text-blue-400 text-xs break-all">
+                      {{ referrerData.root_invite.join_url || 'No URL available' }}
+                    </p>
+                  </div>
+                </div>
+                
+                <div v-if="referrerData.root_invite.join_url" class="flex items-center gap-2 ml-4">
+                  <button
+                    @click="copyUrl(referrerData.root_invite.join_url)"
+                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md p-1"
+                    title="Copy URL"
+                  >
+                    <i class="fas fa-copy w-4 h-4"></i>
+                  </button>
+                  <button
+                    @click="openUrl(referrerData.root_invite.join_url)"
+                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md p-1"
+                    title="Open URL"
+                  >
+                    <i class="fas fa-external-link-alt w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Children of the root invite -->
+            <div v-if="referrerData.tree && referrerData.tree.length > 0" class="ml-4">
+              <ReferrerTreeNode
+                v-for="node in referrerData.tree"
+                :key="node.id"
+                :node="node"
+                :depth="1"
+              />
+            </div>
+          </div>
         </div>
       </div>
 

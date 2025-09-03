@@ -135,6 +135,30 @@ async function getPageReferrers(pageId) {
   }
 }
 
+// Get page requests
+async function getPageRequests() {
+  try {
+    const response = await api.get('/admin/page-requests')
+    return response.data
+  } catch (error) {
+    console.error('Error fetching page requests:', error)
+    throw error
+  }
+}
+
+// Update page request status
+async function updatePageRequestStatus(requestId, status) {
+  try {
+    const response = await api.patch(`/admin/page-requests/${requestId}/status`, {
+      status
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error updating page request status:', error)
+    throw error
+  }
+}
+
 export default {
   getPages,
   getPage,
@@ -144,5 +168,7 @@ export default {
   togglePageStatus,
   bulkUpdatePages,
   bulkDeletePages,
-  getPageReferrers
+  getPageReferrers,
+  getPageRequests,
+  updatePageRequestStatus
 } 

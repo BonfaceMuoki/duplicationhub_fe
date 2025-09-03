@@ -36,18 +36,20 @@
             </div>
             <div>
               <p class="text-gray-600 dark:text-gray-400">Invited by</p>
-              <p class="font-medium text-gray-900 dark:text-white">{{ node.inviter?.user?.name || 'Root' }}</p>
-              <p class="text-xs text-gray-500 dark:text-gray-500">{{ node.inviter?.handle || 'N/A' }}</p>
+              <p class="font-medium text-gray-900 dark:text-white">{{ node.inviter?.user?.name || 'System' }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-500">{{ node.inviter?.handle || 'Root Invite' }}</p>
             </div>
           </div>
           
           <div class="mt-2">
             <p class="text-gray-600 dark:text-gray-400 text-xs">Join URL</p>
-            <p class="text-blue-600 dark:text-blue-400 text-xs break-all">{{ node.join_url }}</p>
+            <p class="text-blue-600 dark:text-blue-400 text-xs break-all">
+              {{ node.join_url || 'No URL available' }}
+            </p>
           </div>
         </div>
         
-        <div class="flex items-center gap-2 ml-4">
+        <div v-if="node.join_url" class="flex items-center gap-2 ml-4">
           <button
             @click="copyUrl"
             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md p-1"
