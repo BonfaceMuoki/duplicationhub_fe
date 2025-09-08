@@ -75,6 +75,9 @@
                 Email
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Phone
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Message
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -119,6 +122,19 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm text-gray-900 dark:text-white">{{ request.email }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <div class="text-sm text-gray-900 dark:text-white">{{ request.phone_number }}</div>
+                  <button
+                    v-if="request.phone_number"
+                    @click="openWhatsApp(request.phone_number)"
+                    class="text-green-400 hover:text-green-600 dark:hover:text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-md p-1"
+                    title="Send WhatsApp Message"
+                  >
+                    <i class="fab fa-whatsapp w-4 h-4"></i>
+                  </button>
+                </div>
               </td>
               <td class="px-6 py-4">
                 <div class="text-sm text-gray-900 dark:text-white max-w-xs truncate" :title="request.message">
@@ -199,6 +215,21 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
               <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ selectedRequest.email }}</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
+              <div class="mt-1 flex items-center gap-2">
+                <p class="text-sm text-gray-900 dark:text-white">{{ selectedRequest.phone_number }}</p>
+                <button
+                  v-if="selectedRequest.phone_number"
+                  @click="openWhatsApp(selectedRequest.phone_number)"
+                  class="text-green-400 hover:text-green-600 dark:hover:text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-md p-1"
+                  title="Send WhatsApp Message"
+                >
+                  <i class="fab fa-whatsapp w-4 h-4"></i>
+                </button>
+              </div>
             </div>
             
             <div>
@@ -347,6 +378,19 @@ const formatDate = (dateString) => {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+const openWhatsApp = (phoneNumber) => {
+  if (phoneNumber) {
+    // Clean the phone number (remove any non-digit characters except +)
+    const cleanPhoneNumber = phoneNumber.replace(/[^\d+]/g, '')
+    
+    // Create WhatsApp URL
+    const whatsappUrl = `https://wa.me/${cleanPhoneNumber}`
+    
+    // Open WhatsApp in a new tab
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer')
+  }
 }
 
 // Lifecycle
